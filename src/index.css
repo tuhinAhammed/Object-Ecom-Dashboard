@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    font-family: "Poppins", "Poppins-fallback";
+    margin: 0px;
+    padding: 0px;
+  }
+
+  :root {
+    --theme-color: #027BFF; /* Website theme color */
+    --theme-deep-color: #006EE5;
+
+  }
