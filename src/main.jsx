@@ -10,7 +10,12 @@ import App from './App.jsx'
 import './index.css'
 import DashboardPage from "./Page/DashboardPage.jsx";
 import Dashboard from "./Page/Dashboard.jsx";
-import PurchaseHistory from "./Page/PurchaseHistory.jsx";
+import Signin from "./Page/SignIn.jsx";
+import { Provider } from "react-redux";
+import store from "./Redux/Store/store.js";
+import Order from "./Page/Order.jsx";
+import Products from "./Page/Products.jsx";
+import Categories from "./Page/Categories.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,16 +30,30 @@ const router = createBrowserRouter([
             element: <Dashboard />
           },
           {
-            path: "purchase-history",
-            element: <PurchaseHistory />
+            path: "order",
+            element: <Order />
+          },
+          {
+            path: "products",
+            element: <Products />
+          },
+          {
+            path: "categories",
+            element: <Categories />
           },
         ]
-      }
+      },
+      {
+        path: "signin",
+        element: <Signin />
+      },
     ]
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+    <Provider store={store}>
     <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );

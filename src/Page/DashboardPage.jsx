@@ -24,14 +24,18 @@ import MinTitle from "../Layout/Title/MinTitle";
 import LargeTitle from "../Layout/Title/LargeTitle";
 import BreadcrumbPath from "../Layout/Breadcrumb/BreadcrumbPath";
 import siteLogo from "../assets/Header/logo.png"
-import { IoMdExpand } from "react-icons/io";
+import { IoIosArrowForward, IoMdExpand } from "react-icons/io";
 function DashboardPage() {
     const location = useLocation();
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Start with full sidebar
     const [activeMenu, setActiveMenu] = useState(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+    const [expandedMenu, setExpandedMenu] = useState(null);
+    const toggleSubmenu = (index) => {
+        // If already open, close it. Otherwise open this and close others
+        setExpandedMenu(prev => (prev === index ? null : index));
+    };
     // Mock data - replace with actual API calls
     const customerProfile = {
         first_name: "John Doe",
@@ -47,10 +51,16 @@ function DashboardPage() {
         setActiveMenu(activeItem);
     }, [location]);
 
-    const handleMenuClick = (index, path) => {
-        setActiveMenu(index);
+    const handleMenuClick = (parentIndex, path, hasSubmenu, isSubmenu = false) => {
+        if (hasSubmenu) return; // Parent with submenu is not clickable
+        setActiveMenu(parentIndex);
         navigate(path);
         setMobileMenuOpen(false);
+
+        // Only close the parent menu if this click is on a different parent
+        if (!isSubmenu) {
+            setExpandedMenu(null);
+        }
     };
 
     const toggleSidebar = () => {
@@ -71,14 +81,18 @@ function DashboardPage() {
             path: "/dashboard",
         },
         {
-            name: "Purchase History",
+            name: "Order",
             icons: <MdPayment />,
-            path: "/dashboard/purchase-history",
+            path: "/dashboard/order",
         },
         {
-            name: "Refund Request",
+            name: "Products",
             icons: <FaRecycle />,
-            path: "/dashboard/refund-requests",
+            path: "",
+            submenu: [
+                { name: "Product Manage", path: "/dashboard/products" },
+                { name: "Categories", path: "/dashboard/categories" },
+            ]
         },
         {
             name: "Wishlist",
@@ -189,33 +203,86 @@ function DashboardPage() {
                                     </div>
 
                                     {/* Navigation Menu */}
-                                    <nav className="p-6" style={{
-                                    boxShadow: "0px 0px 25px  rgba(0,0,0,0.20)",
-                                }}>
-                                        <ul className="space-y-2">
-                                            {sidebarItems.map((item, index) => (
-                                                <li onMouseEnter={toggleSidebarAuto} key={index}>
-                                                    <button
-                                                        className={`w-full text-left px-4 py-3 rounded-lg flex items-center transition-colors duration-200 ${activeMenu === index
-                                                            ? "bg-blue-600 text-white"
-                                                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                                                            } ${sidebarCollapsed ? "justify-center" : "gap-3"
-                                                            }`}
-                                                        onClick={() => handleMenuClick(index, item.path)}
-                                                        title={sidebarCollapsed ? item.name : ""}
-                                                    >
-                                                        <span className="text-xl flex-shrink-0">
-                                                            {item.icons}
-                                                        </span>
-                                                        {!sidebarCollapsed && (
-                                                            <span className="font-medium text-sm whitespace-nowrap">
-                                                                {item.name}
-                                                            </span>
+                                    <nav className="px-4 py-6" style={{
+                                        boxShadow: "0px 0px 25px  rgba(0,0,0,0.20)",
+                                    }}>
+                                        <ul className="grid grid-cols-1 gap-4">
+                                            {sidebarItems.map((item, index) => {
+                                                const isActive = activeMenu === index ||
+                                                    (item.submenu && item.submenu.some(sub => sub.path === location.pathname));
+                                                const isExpanded = expandedMenu === index;
+
+                                                return (
+                                                    <li key={index}>
+                                                        <div className="flex items-center justify-between">
+                                                            {/* Parent Button */}
+                                                            <button
+                                                                className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors duration-200
+                        ${isActive
+                                                                        ? "bg-blue-600 text-white"
+                                                                        : "text-gray-700 bg-gray-200 hover:bg-blue-50 hover:text-blue-600"
+                                                                    } ${sidebarCollapsed ? "justify-center" : "gap-3"}`}
+                                                                onClick={() => {
+                                                                    if (item.submenu) {
+                                                                        // Parent has submenu → toggle it
+                                                                        toggleSubmenu(index);
+                                                                    } else {
+                                                                        // Parent without submenu → navigate
+                                                                        handleMenuClick(index, item.path, false);
+                                                                    }
+                                                                }}
+                                                                title={sidebarCollapsed ? item.name : ""}
+                                                            >
+                                                                <span className="flex items-center gap-3">
+                                                                    <span className="text-xl flex-shrink-0">{item.icons}</span>
+                                                                    {!sidebarCollapsed && <span className="font-medium text-sm">{item.name}</span>}
+                                                                </span>
+
+                                                                {/* Arrow */}
+                                                                {item.submenu && !sidebarCollapsed && (
+                                                                    <span
+                                                                        className={`transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`}
+                                                                        onClick={() => toggleSubmenu(index)}
+                                                                    >
+                                                                        <IoIosArrowForward />
+                                                                    </span>
+                                                                )}
+                                                            </button>
+
+                                                            {/* Submenu */}
+                                                        </div>
+
+                                                        {item.submenu && !sidebarCollapsed && (
+                                                            <div
+                                                                className={`overflow-hidden transition-all duration-300 ease-in-out
+      ${isExpanded ? "max-h-60 opacity-100 mt-2" : "max-h-0 opacity-0"}`}
+                                                            >
+                                                                <ul className="pl-2 space-y-1">
+                                                                    {item.submenu.map((sub, subIndex) => (
+                                                                        <li key={subIndex}>
+                                                                            <button
+                                                                                className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200
+              ${location.pathname === sub.path
+                ? "bg-blue-600 text-white"
+                : "text-gray-700 bg-gray-200 hover:bg-blue-50 hover:text-blue-600"
+                                                                                    }`}
+                                                                                onClick={() => handleMenuClick(index, sub.path, false, true)}
+                                                                            >
+                                                                                <span className="flex items-center gap-3">
+                                                                                <span className="text-xl flex-shrink-0">{item.icons}</span>
+                                                                                <span className="font-medium text-sm">{sub.name}</span>
+                                                                                </span>
+                                                                            </button>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
                                                         )}
-                                                    </button>
-                                                </li>
-                                            ))}
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
+
                                     </nav>
                                 </div>
                             </div>
