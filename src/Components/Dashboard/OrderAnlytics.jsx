@@ -125,7 +125,7 @@ const OrdersAnalytics = ({ orderData }) => {
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
-      if (i < revenueData.labels.length) {
+      if (i < revenueData?.labels?.length) {
         setRaceData({
           labels: revenueData.labels.slice(0, i + 1),
           datasets: [{

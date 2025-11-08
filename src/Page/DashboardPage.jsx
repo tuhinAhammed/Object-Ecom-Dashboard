@@ -195,7 +195,7 @@ function DashboardPage() {
                                         {/* Collapse Toggle Button */}
                                         <button
                                             onClick={toggleSidebar}
-                                            className={`absolute -right-5 top-8 bg-blue-600 p-2 rounded-full text-white shadow-lg transition-transform duration-300 ${sidebarCollapsed ? "rotate-180" : ""
+                                            className={`absolute -right-5 top-8 bg-theme p-2 rounded-full text-white shadow-lg transition-transform duration-300 ${sidebarCollapsed ? "rotate-180" : ""
                                                 }`}
                                         >
                                             <FaArrowLeft className="text-sm" />
@@ -219,8 +219,8 @@ function DashboardPage() {
                                                             <button
                                                                 className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors duration-200
                         ${isActive
-                                                                        ? "bg-blue-600 text-white"
-                                                                        : "text-gray-700 bg-gray-200 hover:bg-blue-50 hover:text-blue-600"
+                                                                        ? "bg-theme text-white"
+                                                                        : "text-gray-700 bg-gray-200 hover:bg-theme hover:bg-opacity-[0.2] hover:text-theme"
                                                                     } ${sidebarCollapsed ? "justify-center" : "gap-3"}`}
                                                                 onClick={() => {
                                                                     if (item.submenu) {
@@ -261,10 +261,10 @@ function DashboardPage() {
                                                                     {item.submenu.map((sub, subIndex) => (
                                                                         <li key={subIndex}>
                                                                             <button
-                                                                                className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200
+                                                                                className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200
               ${location.pathname === sub.path
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 bg-gray-200 hover:bg-blue-50 hover:text-blue-600"
+                ? "bg-theme text-white"
+                : "text-gray-700 bg-gray-200 hover:bg-theme hover:bg-opacity-[0.2] hover:text-theme"
                                                                                     }`}
                                                                                 onClick={() => handleMenuClick(index, sub.path, false, true)}
                                                                             >
